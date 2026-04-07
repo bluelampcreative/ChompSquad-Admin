@@ -63,15 +63,25 @@ export function useAdmin() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const valid = getValidToken();
+    let cancelled = false;
 
-    if (!valid) {
-      router.replace("/login");
-      return;
+    async function checkAuth() {
+      const valid = getValidToken();
+      if (!valid) {
+        router.replace("/login");
+        return;
+      }
+      if (!cancelled) {
+        setToken(valid);
+        setReady(true);
+      }
     }
 
-    setToken(valid);
-    setReady(true);
+    checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   return { token, ready };
