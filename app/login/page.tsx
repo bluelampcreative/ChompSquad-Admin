@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api/auth";
-import { saveToken, getToken } from "@/lib/hooks/useAdmin";
+import { saveToken, getValidToken } from "@/lib/hooks/useAdmin";
 import { useEffect } from "react";
 
 export default function LoginPage() {
@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (getToken()) router.replace("/");
+    if (getValidToken()) router.replace("/");
   }, [router]);
 
   async function handleSubmit(e: FormEvent) {

@@ -85,6 +85,7 @@ Group threads that touch the same file so edits are batched — do not make mult
 ## Step 3 — Clarify Ambiguous Comments
 
 Before editing anything, identify comments that are:
+
 - Subjective or opinion-based ("I'd prefer X" without a clear directive)
 - Contradictory to another comment on the same block
 - Architectural in scope (suggesting a structural refactor vs. a local fix)
