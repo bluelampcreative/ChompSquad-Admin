@@ -25,7 +25,7 @@ review reports. Talks exclusively to the `ChompSquad-API` (FastAPI/Python) backe
 Single required env var:
 
 ```
-NEXT_PUBLIC_API_URL=https://api.chompsquad.com
+NEXT_PUBLIC_API_URL=https://api.chompsquad.app
 ```
 
 For local dev, create `.env.local` pointing at the local or staging API. Never commit `.env.local`.
