@@ -25,7 +25,7 @@ review reports. Talks exclusively to the `ChompSquad-API` (FastAPI/Python) backe
 Single required env var:
 
 ```
-NEXT_PUBLIC_API_URL=https://api.chompsquad.com
+NEXT_PUBLIC_API_URL=https://api.chompsquad.app
 ```
 
 For local dev, create `.env.local` pointing at the local or staging API. Never commit `.env.local`.
@@ -36,6 +36,7 @@ All requests go to `NEXT_PUBLIC_API_URL`. Admin endpoints require a Bearer JWT i
 `Authorization` header obtained from `POST /v1/auth/login`.
 
 Key endpoints:
+
 - `GET  /v1/admin/featured-recipes` — list pins (ordered by position)
 - `POST /v1/admin/featured-recipes` — pin a recipe
 - `PATCH /v1/admin/featured-recipes/{id}` — update position
@@ -63,11 +64,13 @@ Key endpoints:
 ## Git workflow
 
 ### Branching
+
 - Feature branches follow `sl/<step>-<short-description>` where step matches the checklist
   (e.g., `sl/b2-auth`, `sl/b3-feed-manager`).
 - Branch from `develop`. PRs target `develop`. `main` is production.
 
 ### Committing and pushing
+
 - Claude may create commits but must never push to a remote.
 - After committing, display the commit message and prompt the developer to push when ready.
 

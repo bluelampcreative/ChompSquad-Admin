@@ -24,6 +24,7 @@ foundations needed in `ChompSquad-API` and the dashboard app in this repo.
 - [x] A.3 `GET /v1/admin/recipes` — search all public recipes (`search`, `tag`, `page`, `page_size`); the single endpoint the dashboard uses to find recipes to pin
 
 Additional endpoints implemented alongside Phase A (needed by Phase B):
+
 - [x] `POST /v1/admin/featured-recipes` — pin a public recipe (B.4)
 - [x] `DELETE /v1/admin/featured-recipes/{id}` — unpin a recipe (B.3)
 - [x] `GET /v1/admin/reports` — list reports with `unreviewed_only` filter (B.5)
