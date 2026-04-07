@@ -57,10 +57,17 @@ export function FeedManager({ token }: Props) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
+    setError(null);
     const oldIndex = pins.findIndex((p) => p.id === active.id);
     const newIndex = pins.findIndex((p) => p.id === over.id);
-    const reordered = arrayMove(pins, oldIndex, newIndex);
 
+    if (oldIndex < 0 || newIndex < 0) {
+      setError("Failed to reorder featured recipes");
+      load();
+      return;
+    }
+
+    const reordered = arrayMove(pins, oldIndex, newIndex);
     setPins(reordered);
 
     try {
@@ -72,6 +79,7 @@ export function FeedManager({ token }: Props) {
   }
 
   async function handleUnpin(id: string) {
+    setError(null);
     setPins((prev) => prev.filter((p) => p.id !== id));
     try {
       await unpinRecipe(token, id);
@@ -82,6 +90,7 @@ export function FeedManager({ token }: Props) {
   }
 
   async function handlePin(recipe: Recipe) {
+    setError(null);
     try {
       const pinned = await pinRecipe(token, recipe.id);
       setPins((prev) => [...prev, pinned]);

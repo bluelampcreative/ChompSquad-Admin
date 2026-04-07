@@ -20,6 +20,7 @@ export interface RecipesPage {
 export async function searchRecipes(
   token: string,
   params: { search?: string; tag?: string; page?: number; page_size?: number },
+  signal?: AbortSignal,
 ): Promise<RecipesPage> {
   const url = new URL(`${API_URL}/v1/admin/recipes`);
   if (params.search) url.searchParams.set("search", params.search);
@@ -30,7 +31,11 @@ export async function searchRecipes(
 
   const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
+    signal,
   });
-  if (!res.ok) throw new Error("Failed to search recipes");
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.detail ?? "Failed to search recipes");
+  }
   return res.json();
 }

@@ -18,7 +18,10 @@ export async function getFeaturedRecipes(
   const res = await fetch(`${API_URL}/v1/admin/featured-recipes`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Failed to load featured recipes");
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.detail ?? "Failed to load featured recipes");
+  }
   return res.json();
 }
 
@@ -34,7 +37,10 @@ export async function pinRecipe(
     },
     body: JSON.stringify({ recipe_id: recipeId }),
   });
-  if (!res.ok) throw new Error("Failed to pin recipe");
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.detail ?? "Failed to pin recipe");
+  }
   return res.json();
 }
 
@@ -51,7 +57,10 @@ export async function updatePosition(
     },
     body: JSON.stringify({ position }),
   });
-  if (!res.ok) throw new Error("Failed to update position");
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.detail ?? "Failed to update position");
+  }
   return res.json();
 }
 
@@ -60,5 +69,8 @@ export async function unpinRecipe(token: string, id: string): Promise<void> {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Failed to unpin recipe");
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error?.detail ?? "Failed to unpin recipe");
+  }
 }

@@ -21,19 +21,26 @@ export function RecipePicker({ token, pinnedIds, onPin }: Props) {
 
     if (!query.trim()) {
       setResults([]);
+      setError(null);
+      setLoading(false);
       return;
     }
 
+    let abortController: AbortController | null = null;
+
     debounceRef.current = setTimeout(async () => {
+      abortController = new AbortController();
       setLoading(true);
       setError(null);
       try {
-        const data = await searchRecipes(token, {
-          search: query.trim(),
-          page_size: 10,
-        });
+        const data = await searchRecipes(
+          token,
+          { search: query.trim(), page_size: 10 },
+          abortController.signal,
+        );
         setResults(data.items);
-      } catch {
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
         setError("Search failed");
       } finally {
         setLoading(false);
@@ -42,6 +49,7 @@ export function RecipePicker({ token, pinnedIds, onPin }: Props) {
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      abortController?.abort();
     };
   }, [query, token]);
 
