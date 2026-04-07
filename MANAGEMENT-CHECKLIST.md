@@ -12,7 +12,7 @@ foundations needed in `ChompSquad-API` and the dashboard app in this repo.
 
 - Firebase App Hosting project connected to this GitHub repo
 - `NEXT_PUBLIC_API_URL` set as an environment variable in Firebase App Hosting config
-- Custom domain configured via Firebase Hosting (pointing to production API domain)
+- Custom domain: `admin.chompsquad.app` — configured via Firebase Hosting console
 - No additional auth layer needed — app-level JWT auth (B.2) is sufficient
 
 ---

@@ -59,7 +59,7 @@ Key endpoints:
 - Connected to this GitHub repo; pushes to `main` trigger production deployments.
 - `NEXT_PUBLIC_API_URL` is set as an environment variable in Firebase App Hosting config (not in
   the repo).
-- Custom domain configured via Firebase Hosting console.
+- Custom domain: `admin.chompsquad.app` — configure via Firebase Hosting console.
 
 ## Git workflow
 
