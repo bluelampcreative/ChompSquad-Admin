@@ -29,7 +29,8 @@ export async function getReports(
     const error = await res.json().catch(() => ({}));
     throw new Error(error?.detail ?? "Failed to load reports");
   }
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.items ?? []);
 }
 
 export async function markReportReviewed(
