@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 
 const TOKEN_KEY = "chompsquad_admin_token";
@@ -64,14 +64,14 @@ export function useAdmin() {
 
   useEffect(() => {
     const valid = getValidToken();
-
     if (!valid) {
       router.replace("/login");
       return;
     }
-
-    setToken(valid);
-    setReady(true);
+    startTransition(() => {
+      setToken(valid);
+      setReady(true);
+    });
   }, [router]);
 
   return { token, ready };
