@@ -22,7 +22,9 @@ export async function getFeaturedRecipes(
     const error = await res.json().catch(() => ({}));
     throw new Error(error?.detail ?? "Failed to load featured recipes");
   }
-  return res.json();
+  const data = await res.json();
+  // API returns either a bare array or { items: [...] }
+  return Array.isArray(data) ? data : (data.items ?? []);
 }
 
 export async function pinRecipe(
