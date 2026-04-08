@@ -33,11 +33,11 @@ Additional endpoints implemented alongside Phase A (needed by Phase B):
 
 ## Phase B — Dashboard App (this repo)
 
-- [ ] B.1 Project setup — Next.js (App Router), Tailwind, `@dnd-kit/sortable`; single env var `NEXT_PUBLIC_API_URL`; deploy target Firebase App Hosting
-- [ ] B.2 Auth — login page → `POST /v1/auth/login` → JWT in `localStorage`; `useAdmin` hook redirects to login if unauthenticated
-- [ ] B.3 Feed Manager — drag-and-drop pinned recipe cards; drag saves new position via `PATCH`; unpin button calls `DELETE`
-- [ ] B.4 Recipe picker — search drawer/modal hits `GET /v1/admin/recipes?search=…`; click result → `POST /v1/admin/featured-recipes` → card appears in pinned list
-- [ ] B.5 Reports page — table view of `GET /v1/admin/reports?unreviewed_only=true`; shows recipe, reporter, reason, notes, timestamp
+- [x] B.1 Project setup — Next.js (App Router), Tailwind, `@dnd-kit/sortable`; single env var `NEXT_PUBLIC_API_URL`; deploy target Firebase App Hosting
+- [x] B.2 Auth — login page → `POST /v1/auth/login` → JWT in `localStorage`; `useAdmin` hook redirects to login if unauthenticated
+- [x] B.3 Feed Manager — drag-and-drop pinned recipe cards; drag saves new position via `PATCH`; unpin button calls `DELETE`
+- [x] B.4 Recipe picker — search drawer/modal hits `GET /v1/admin/recipes?search=…`; click result → `POST /v1/admin/featured-recipes` → card appears in pinned list
+- [x] B.5 Reports page — table view of `GET /v1/admin/reports?unreviewed_only=true`; shows recipe, reporter, reason, notes, timestamp
 - [ ] B.6 Deploy — Firebase App Hosting project connected to this repo; `NEXT_PUBLIC_API_URL` pointed at production API; custom domain configured
 
 ---

@@ -12,6 +12,7 @@ export function ReportsList({ token }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [unreviewedOnly, setUnreviewedOnly] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- retained for when PATCH /v1/admin/reports/{id} is implemented
   const [reviewing, setReviewing] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -31,6 +32,7 @@ export function ReportsList({ token }: Props) {
     load();
   }, [load]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- retained for when PATCH /v1/admin/reports/{id} is implemented
   async function handleMarkReviewed(id: string) {
     setError(null);
     setReviewing(id);
@@ -96,12 +98,13 @@ export function ReportsList({ token }: Props) {
                   </p>
                 </div>
                 {!report.reviewed && (
+                  // TODO: enable once PATCH /v1/admin/reports/{id} is implemented in the API
                   <button
-                    onClick={() => handleMarkReviewed(report.id)}
-                    disabled={reviewing === report.id}
-                    className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-md bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                    disabled
+                    title="Coming soon"
+                    className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-md bg-gray-900 text-white opacity-30 cursor-not-allowed"
                   >
-                    {reviewing === report.id ? "Saving…" : "Mark reviewed"}
+                    Mark reviewed
                   </button>
                 )}
                 {report.reviewed && (
