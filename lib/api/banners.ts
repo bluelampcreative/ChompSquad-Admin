@@ -48,7 +48,7 @@ export async function listBanners(
   });
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error?.detail ?? "Failed to load banners");
+    throw new Error(error?.detail ?? `Failed to load banners (${res.status})`);
   }
   return res.json();
 }
