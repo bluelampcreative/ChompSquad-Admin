@@ -12,6 +12,13 @@ export interface FeaturedRecipe {
   position: number;
 }
 
+interface FeaturedRecipesPage {
+  items: FeaturedRecipe[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export async function getFeaturedRecipes(
   token: string,
 ): Promise<FeaturedRecipe[]> {
@@ -22,7 +29,8 @@ export async function getFeaturedRecipes(
     const error = await res.json().catch(() => ({}));
     throw new Error(error?.detail ?? "Failed to load featured recipes");
   }
-  return res.json();
+  const data: FeaturedRecipe[] | FeaturedRecipesPage = await res.json();
+  return Array.isArray(data) ? data : data.items;
 }
 
 export async function pinRecipe(

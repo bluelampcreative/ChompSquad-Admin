@@ -15,6 +15,13 @@ export interface Report {
   reviewed: boolean;
 }
 
+export interface ReportsPage {
+  items: Report[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export async function getReports(
   token: string,
   unreviewedOnly: boolean,
@@ -29,7 +36,8 @@ export async function getReports(
     const error = await res.json().catch(() => ({}));
     throw new Error(error?.detail ?? "Failed to load reports");
   }
-  return res.json();
+  const data: Report[] | ReportsPage = await res.json();
+  return Array.isArray(data) ? data : data.items;
 }
 
 export async function markReportReviewed(
