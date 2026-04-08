@@ -30,7 +30,6 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
   const [imageUrl, setImageUrl] = useState(banner?.image_url ?? "");
   const [ctaLabel, setCtaLabel] = useState(banner?.cta_label ?? "");
   const [ctaUrl, setCtaUrl] = useState(banner?.cta_url ?? "");
-  const [priority, setPriority] = useState(String(banner?.priority ?? 0));
   const [activeFrom, setActiveFrom] = useState(
     banner?.active_from ? toDatetimeLocal(banner.active_from) : "",
   );
@@ -64,7 +63,6 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
       image_url: imageUrl.trim() || null,
       cta_label: ctaLabel.trim() || null,
       cta_url: ctaUrl.trim() || null,
-      priority: Number(priority),
       active_until: activeUntil ? new Date(activeUntil).toISOString() : null,
     };
 
@@ -160,17 +158,6 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
             />
           </Field>
         </div>
-
-        <Field label="Priority" hint="0 = standard, 5+ = high — use sparingly">
-          <input
-            type="number"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            min={0}
-            required
-            className={inputClass}
-          />
-        </Field>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Active from" required>

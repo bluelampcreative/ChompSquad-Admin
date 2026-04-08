@@ -1,12 +1,5 @@
-"use client";
-
-import { useAdmin } from "@/lib/hooks/useAdmin";
-import { FeedManager } from "./_components/FeedManager";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  const { token, ready } = useAdmin();
-
-  if (!ready || !token) return null;
-
-  return <FeedManager token={token} />;
+  redirect("/banners");
 }

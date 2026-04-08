@@ -27,9 +27,6 @@ export function Nav() {
     <header className="border-b border-gray-200 bg-white">
       <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
         <nav className="flex items-center gap-6">
-          <Link href="/" className={linkClass("/")}>
-            Feed
-          </Link>
           <Link href="/banners" className={linkClass("/banners")}>
             Banners
           </Link>
