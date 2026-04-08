@@ -30,6 +30,9 @@ export function Nav() {
           <Link href="/" className={linkClass("/")}>
             Feed
           </Link>
+          <Link href="/banners" className={linkClass("/banners")}>
+            Banners
+          </Link>
           <Link href="/reports" className={linkClass("/reports")}>
             Reports
           </Link>
