@@ -11,6 +11,7 @@ import {
 interface Props {
   token: string;
   banner?: BannerResponse;
+  defaultPriority?: number;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -22,19 +23,18 @@ function toDatetimeLocal(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
+export function BannerForm({ token, banner, defaultPriority = 0, onSuccess, onCancel }: Props) {
   const isEdit = !!banner;
 
   const [title, setTitle] = useState(banner?.title ?? "");
-  const [body, setBody] = useState(banner?.body ?? "");
-  const [imageUrl, setImageUrl] = useState(banner?.image_url ?? "");
+  const [subtitle, setSubtitle] = useState(banner?.subtitle ?? "");
   const [ctaLabel, setCtaLabel] = useState(banner?.cta_label ?? "");
   const [ctaUrl, setCtaUrl] = useState(banner?.cta_url ?? "");
-  const [activeFrom, setActiveFrom] = useState(
-    banner?.active_from ? toDatetimeLocal(banner.active_from) : "",
+  const [startsAt, setStartsAt] = useState(
+    banner?.starts_at ? toDatetimeLocal(banner.starts_at) : "",
   );
-  const [activeUntil, setActiveUntil] = useState(
-    banner?.active_until ? toDatetimeLocal(banner.active_until) : "",
+  const [endsAt, setEndsAt] = useState(
+    banner?.ends_at ? toDatetimeLocal(banner.ends_at) : "",
   );
 
   const [submitting, setSubmitting] = useState(false);
@@ -44,29 +44,34 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
     (ctaUrl.trim() !== "" && ctaLabel.trim() === "") ||
     (ctaLabel.trim() !== "" && ctaUrl.trim() === "");
 
-  const untilBeforeFrom =
-    activeUntil !== "" &&
-    activeFrom !== "" &&
-    new Date(activeUntil) < new Date(activeFrom);
+  const endsBeforeStarts =
+    endsAt !== "" &&
+    startsAt !== "" &&
+    new Date(endsAt) < new Date(startsAt);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (untilBeforeFrom) return;
+    if (endsBeforeStarts) return;
 
     setError(null);
     setSubmitting(true);
 
-    const payload: BannerCreatePayload = {
-      title: title.trim(),
-      body: body.trim(),
-      active_from: new Date(activeFrom).toISOString(),
-      image_url: imageUrl.trim() || null,
-      cta_label: ctaLabel.trim() || null,
-      cta_url: ctaUrl.trim() || null,
-      active_until: activeUntil ? new Date(activeUntil).toISOString() : null,
-    };
-
     try {
+      const startsAtDate = startsAt ? new Date(startsAt) : null;
+      if (startsAtDate && isNaN(startsAtDate.getTime())) {
+        throw new Error("Start date is invalid");
+      }
+
+      const payload: BannerCreatePayload = {
+        title: title.trim(),
+        subtitle: subtitle.trim() || null,
+        starts_at: startsAtDate ? startsAtDate.toISOString() : null,
+        ends_at: endsAt ? new Date(endsAt).toISOString() : null,
+        cta_label: ctaLabel.trim() || null,
+        cta_url: ctaUrl.trim() || null,
+        display_order: banner ? banner.display_order : defaultPriority,
+      };
+
       if (isEdit) {
         await updateBanner(token, banner.id, payload);
       } else {
@@ -104,23 +109,12 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
           />
         </Field>
 
-        <Field label="Body" required hint="Max 280 chars">
+        <Field label="Subtitle" hint="Max 280 chars — supporting text below the title">
           <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
             maxLength={280}
-            required
             rows={3}
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Image URL" hint="Max 1000 chars — hosted externally or on GCS">
-          <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            maxLength={1000}
             className={inputClass}
           />
         </Field>
@@ -142,11 +136,7 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
 
           <Field
             label="CTA URL"
-            hint={
-              ctaMismatch
-                ? "Required when CTA label is set"
-                : "chompsquad:// or https://"
-            }
+            hint={ctaMismatch ? "Required when CTA label is set" : "chompsquad:// or https://"}
             warn={ctaMismatch}
           >
             <input
@@ -160,25 +150,24 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Active from" required>
+          <Field label="Starts at">
             <input
               type="datetime-local"
-              value={activeFrom}
-              onChange={(e) => setActiveFrom(e.target.value)}
-              required
+              value={startsAt}
+              onChange={(e) => setStartsAt(e.target.value)}
               className={inputClass}
             />
           </Field>
 
           <Field
-            label="Active until"
-            hint={untilBeforeFrom ? "Must be after Active from" : "Leave blank for no expiry"}
-            warn={untilBeforeFrom}
+            label="Ends at"
+            hint={endsBeforeStarts ? "Must be after Starts at" : "Leave blank for no expiry"}
+            warn={endsBeforeStarts}
           >
             <input
               type="datetime-local"
-              value={activeUntil}
-              onChange={(e) => setActiveUntil(e.target.value)}
+              value={endsAt}
+              onChange={(e) => setEndsAt(e.target.value)}
               className={inputClass}
             />
           </Field>
@@ -194,7 +183,7 @@ export function BannerForm({ token, banner, onSuccess, onCancel }: Props) {
           </button>
           <button
             type="submit"
-            disabled={submitting || untilBeforeFrom}
+            disabled={submitting || endsBeforeStarts}
             className="text-sm font-medium px-4 py-2 rounded-md bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
           >
             {submitting ? "Saving…" : isEdit ? "Save changes" : "Create banner"}

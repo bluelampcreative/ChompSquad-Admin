@@ -6,27 +6,36 @@ if (!API_URL) {
 
 export interface BannerResponse {
   id: string;
-  created_by_user_id: string;
   title: string;
-  body: string;
-  image_url: string | null;
+  subtitle: string | null;
+  label: string | null;
+  theme: string | null;
   cta_label: string | null;
+  cta_type: string | null;
   cta_url: string | null;
-  priority: number;
-  active_from: string;
-  active_until: string | null;
+  tap_action: string | null;
+  display_order: number;
+  feed_slot: number | null;
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
   created_at: string;
 }
 
 export interface BannerCreatePayload {
   title: string;
-  body: string;
-  active_from: string;
-  image_url?: string | null;
+  subtitle?: string | null;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  display_order?: number;
+  is_active?: boolean;
+  label?: string | null;
+  theme?: string | null;
   cta_label?: string | null;
+  cta_type?: string | null;
   cta_url?: string | null;
-  priority?: number;
-  active_until?: string | null;
+  tap_action?: string | null;
+  feed_slot?: number | null;
 }
 
 export type BannerUpdatePayload = Partial<BannerCreatePayload>;

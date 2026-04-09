@@ -33,10 +33,11 @@ interface Props {
 type FormMode = { type: "create" } | { type: "edit"; banner: BannerResponse } | null;
 
 function getBannerStatus(banner: BannerResponse): "live" | "scheduled" | "expired" {
+  if (!banner.is_active) return "expired";
   const now = Date.now();
-  const from = new Date(banner.active_from).getTime();
-  const until = banner.active_until ? new Date(banner.active_until).getTime() : null;
-  if (from > now) return "scheduled";
+  const from = banner.starts_at ? new Date(banner.starts_at).getTime() : null;
+  const until = banner.ends_at ? new Date(banner.ends_at).getTime() : null;
+  if (from !== null && from > now) return "scheduled";
   if (until !== null && until <= now) return "expired";
   return "live";
 }
@@ -47,8 +48,11 @@ const statusStyles = {
   expired: "bg-gray-100 text-gray-500",
 };
 
-function formatDatetime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
+function formatDatetime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -106,7 +110,7 @@ function SortableBannerRow({
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </span>
             </div>
-            <p className="text-xs text-gray-500 line-clamp-2">{banner.body}</p>
+            <p className="text-xs text-gray-500 line-clamp-2">{banner.subtitle}</p>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -128,12 +132,16 @@ function SortableBannerRow({
 
         <div className="flex items-center gap-3 text-xs text-gray-400 pl-8">
           <span>{slotLabel}</span>
-          <span>·</span>
-          <span>From {formatDatetime(banner.active_from)}</span>
-          {banner.active_until && (
+          {banner.starts_at && (
             <>
               <span>·</span>
-              <span>Until {formatDatetime(banner.active_until)}</span>
+              <span>From {formatDatetime(banner.starts_at)}</span>
+            </>
+          )}
+          {banner.ends_at && (
+            <>
+              <span>·</span>
+              <span>Until {formatDatetime(banner.ends_at)}</span>
             </>
           )}
         </div>
@@ -159,7 +167,7 @@ export function BannerList({ token }: Props) {
     setError(null);
     try {
       const data = await listBanners(token);
-      setBanners([...data.items].sort((a, b) => a.priority - b.priority));
+      setBanners([...data.items].sort((a, b) => a.display_order - b.display_order));
     } catch {
       setError("Failed to load banners");
     } finally {
@@ -179,13 +187,16 @@ export function BannerList({ token }: Props) {
     const newIndex = banners.findIndex((b) => b.id === over.id);
     if (oldIndex < 0 || newIndex < 0) return;
 
-    const reordered = arrayMove(banners, oldIndex, newIndex);
+    const reordered = arrayMove(banners, oldIndex, newIndex).map((b, i) => ({
+      ...b,
+      display_order: i,
+    }));
     setBanners(reordered);
     setError(null);
 
     try {
       await Promise.all(
-        reordered.map((banner, i) => updateBanner(token, banner.id, { priority: i })),
+        reordered.map((b) => updateBanner(token, b.id, { display_order: b.display_order })),
       );
     } catch {
       setError("Failed to save new order");
@@ -203,11 +214,13 @@ export function BannerList({ token }: Props) {
     setDeleting(banner.id);
     try {
       await deleteBanner(token, banner.id);
-      const remaining = banners.filter((b) => b.id !== banner.id);
+      const remaining = banners
+        .filter((b) => b.id !== banner.id)
+        .map((b, i) => ({ ...b, display_order: i }));
       setBanners(remaining);
-      // Re-sequence priorities after deletion
+      // Re-sequence display_order after deletion
       await Promise.all(
-        remaining.map((b, i) => updateBanner(token, b.id, { priority: i })),
+        remaining.map((b) => updateBanner(token, b.id, { display_order: b.display_order })),
       );
     } catch {
       setError("Failed to delete banner");
@@ -223,6 +236,7 @@ export function BannerList({ token }: Props) {
   }
 
   const liveBanners = banners.filter((b) => getBannerStatus(b) === "live");
+
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
@@ -243,9 +257,9 @@ export function BannerList({ token }: Props) {
                     Slot {i}
                   </span>
                   <p className="text-sm font-medium text-gray-900 truncate">{b.title}</p>
-                  {b.active_until && (
+                  {b.ends_at && (
                     <p className="text-xs text-gray-400 flex-shrink-0 ml-auto">
-                      Expires {formatDatetime(b.active_until)}
+                      Expires {formatDatetime(b.ends_at)}
                     </p>
                   )}
                 </div>
@@ -280,6 +294,7 @@ export function BannerList({ token }: Props) {
         {formMode?.type === "create" && (
           <BannerForm
             token={token}
+            defaultPriority={banners.length}
             onSuccess={handleFormSuccess}
             onCancel={() => setFormMode(null)}
           />
@@ -321,7 +336,7 @@ export function BannerList({ token }: Props) {
                     <SortableBannerRow
                       key={banner.id}
                       banner={banner}
-                      slotLabel={FEED_SLOTS[banner.priority] ?? `Index ${banner.priority * 5}`}
+                      slotLabel={FEED_SLOTS[banner.display_order ?? 0] ?? `Index ${(banner.display_order ?? 0) * 5}`}
                       onEdit={() => setFormMode({ type: "edit", banner })}
                       onDelete={() => handleDelete(banner)}
                       deleting={deleting === banner.id}
