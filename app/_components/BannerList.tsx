@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   DndContext,
   closestCenter,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -14,6 +15,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
   useSortable,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -147,14 +149,17 @@ export function BannerList({ token }: Props) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [formMode, setFormMode] = useState<FormMode>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await listBanners(token);
-      setBanners(data.items);
+      setBanners([...data.items].sort((a, b) => a.priority - b.priority));
     } catch {
       setError("Failed to load banners");
     } finally {
@@ -316,7 +321,7 @@ export function BannerList({ token }: Props) {
                     <SortableBannerRow
                       key={banner.id}
                       banner={banner}
-                      slotLabel={FEED_SLOTS[i] ?? `Index ${i * 5}`}
+                      slotLabel={FEED_SLOTS[banner.priority] ?? `Index ${banner.priority * 5}`}
                       onEdit={() => setFormMode({ type: "edit", banner })}
                       onDelete={() => handleDelete(banner)}
                       deleting={deleting === banner.id}

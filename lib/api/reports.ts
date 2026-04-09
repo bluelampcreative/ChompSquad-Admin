@@ -30,7 +30,8 @@ export async function getReports(
     throw new Error(error?.detail ?? "Failed to load reports");
   }
   const data = await res.json();
-  return Array.isArray(data) ? data : (data.items ?? []);
+  if (Array.isArray(data)) return data;
+  return Array.isArray(data?.items) ? data.items : [];
 }
 
 export async function markReportReviewed(
