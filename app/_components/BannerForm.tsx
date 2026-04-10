@@ -62,6 +62,7 @@ export function BannerForm({ token, banner, defaultPriority = 0, onSuccess, onCa
         throw new Error("Start date is invalid");
       }
 
+      const displayOrder = banner ? banner.display_order : defaultPriority;
       const payload: BannerCreatePayload = {
         title: title.trim(),
         subtitle: subtitle.trim() || null,
@@ -69,7 +70,8 @@ export function BannerForm({ token, banner, defaultPriority = 0, onSuccess, onCa
         ends_at: endsAt ? new Date(endsAt).toISOString() : null,
         cta_label: ctaLabel.trim() || null,
         cta_url: ctaUrl.trim() || null,
-        display_order: banner ? banner.display_order : defaultPriority,
+        display_order: displayOrder,
+        feed_slot: displayOrder * 5,
       };
 
       if (isEdit) {

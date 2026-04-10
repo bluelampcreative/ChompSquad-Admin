@@ -196,7 +196,9 @@ export function BannerList({ token }: Props) {
 
     try {
       await Promise.all(
-        reordered.map((b) => updateBanner(token, b.id, { display_order: b.display_order })),
+        reordered.map((b) =>
+          updateBanner(token, b.id, { display_order: b.display_order, feed_slot: b.display_order * 5 }),
+        ),
       );
     } catch {
       setError("Failed to save new order");
@@ -220,7 +222,9 @@ export function BannerList({ token }: Props) {
       setBanners(remaining);
       // Re-sequence display_order after deletion
       await Promise.all(
-        remaining.map((b) => updateBanner(token, b.id, { display_order: b.display_order })),
+        remaining.map((b) =>
+          updateBanner(token, b.id, { display_order: b.display_order, feed_slot: b.display_order * 5 }),
+        ),
       );
     } catch {
       setError("Failed to delete banner");
