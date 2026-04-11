@@ -25,3 +25,4 @@ jobs:
           projectId: chompsquad-bb2b0
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
